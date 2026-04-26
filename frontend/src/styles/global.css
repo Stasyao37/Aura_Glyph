@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  /* Background */
+  --color-bg-deep:    #101012;
+  --color-bg-surface: #18181c;
+  --color-bg-raised:  #1e1e22;
+
+  /* Accent — Aura Glyph blue */
+  --color-accent:       #1E40AF;
+  --color-accent-light: #3B82F6;
+
+  /* Aura Glow gradient endpoints */
+  --color-aura-teal:   #2DD4BF;
+  --color-aura-purple: #7C3AED;
+
+  /* Text */
+  --color-text-primary: #EDEDF0;
+  --color-text-muted:   #5A5A6A;
+  --color-text-subtle:  #3A3A4A;
+
+  /* Glass system */
+  --glass-bg:     rgba(16, 16, 18, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.06);
+
+  /* Glow shadows */
+  --glow-accent: 0 0 18px rgba(30, 64, 175, 0.45);
+  --glow-aura:   0 0 24px rgba(124, 58, 237, 0.35);
+  --glow-close:  0 0 14px rgba(239, 68, 68, 0.5);
+}
+
+/* ── Reset & base ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background-color: #101012;
+  color: #EDEDF0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Disable text selection everywhere except editor */
+body {
+  user-select: none;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
