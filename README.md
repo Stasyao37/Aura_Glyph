@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✦ Aura Glyph
+<img src = aura_glyph_logo.svg> </img>
 
 **Modern. Minimalist. Atmospheric.**
 

@@ -1,0 +1,32 @@
+<svg width="100%" viewBox="0 0 680 185" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Aura Glyph logo</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">Four-pointed star with teal-to-violet gradient and Aura Glyph wordmark</desc>
+  <defs>
+    <linearGradient id="aug-star" x1="58" y1="50" x2="142" y2="134" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="aug-rule" x1="178" y1="0" x2="450" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2DD4BF"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Aura rings -->
+  <circle cx="100" cy="92" r="65" fill="none" stroke="#7C3AED" stroke-width="0.5" opacity="0.2" style="fill:none;stroke:rgb(124, 58, 237);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.2;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <circle cx="100" cy="92" r="55" fill="none" stroke="#2DD4BF" stroke-width="0.5" opacity="0.25" style="fill:none;stroke:rgb(45, 212, 191);color:rgb(251, 251, 254);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.25;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- ✦ Four-pointed star -->
+  <path d="M100,50 L109.2,82.8 L142,92 L109.2,101.2 L100,134 L90.8,101.2 L58,92 L90.8,82.8 Z" fill="url(#aug-star)" style="stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Wordmark -->
+  <text y="112" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="50" letter-spacing="-1" style="fill:rgb(0, 0, 0);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:system-ui, -apple-system, BlinkMacSystemFont, sans-serif;font-size:50px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+    <tspan x="178" fill="#2DD4BF" font-weight="300" style="fill:rgb(45, 212, 191);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:system-ui, -apple-system, BlinkMacSystemFont, sans-serif;font-size:50px;font-weight:300;text-anchor:start;dominant-baseline:auto">Aura </tspan><tspan fill="#7C3AED" font-weight="600" style="fill:rgb(124, 58, 237);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:system-ui, -apple-system, BlinkMacSystemFont, sans-serif;font-size:50px;font-weight:600;text-anchor:start;dominant-baseline:auto">Glyph</tspan>
+  </text>
+
+  <!-- Gradient rule -->
+  <line x1="178" y1="122" x2="450" y2="122" stroke="url(#aug-rule)" stroke-width="0.6" opacity="0.45" style="fill:rgb(0, 0, 0);color:rgb(251, 251, 254);stroke-width:0.6px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.45;font-family:&quot;Anthropic Sans&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Tagline -->
+  <text x="180" y="140" font-family="system-ui,-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" font-weight="400" fill="var(--color-text-tertiary)" letter-spacing="3.5" style="fill:rgb(156, 154, 146);stroke:none;color:rgb(251, 251, 254);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:system-ui, -apple-system, BlinkMacSystemFont, sans-serif;font-size:11px;font-weight:400;text-anchor:start;dominant-baseline:auto">Part of the Aura Suite</text>
+</svg>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { RenderMarkdown } from "../../wailsjs/go/main/App"
+import { type DocSettings } from "../presets"
 
 // A4 at 96 DPI
 const A4_W = 794
@@ -18,17 +19,12 @@ const CONTENT_W = A4_W - M_LEFT - M_RIGHT
 const CONTENT_H = A4_H - M_TOP - M_BOTTOM - HEADER_ZONE - FOOTER_ZONE
 
 interface PagePreviewProps {
-  content:       string
-  fontFamily:    string
-  fontSize:      string
-  lineHeight:    string
-  filename:      string
-  headerLeft?:   string
-  headerCenter?: string
-  headerRight?:  string
-  footerLeft?:   string
-  footerCenter?: string
-  footerRight?:  string
+  content:     string
+  fontFamily:  string
+  fontSize:    string
+  lineHeight:  string
+  filename:    string
+  docSettings: DocSettings
 }
 
 function interpolate(tpl: string, page: number, total: number, filename: string): string {
@@ -38,10 +34,20 @@ function interpolate(tpl: string, page: number, total: number, filename: string)
     .replace(/\{filename\}/g, filename)
 }
 
+function headerValues(ds: DocSettings, isFirst: boolean) {
+  return isFirst && ds.specialFirstPage
+    ? [ds.firstHeaderLeft, ds.firstHeaderCenter, ds.firstHeaderRight]
+    : [ds.headerLeft,      ds.headerCenter,      ds.headerRight]
+}
+
+function footerValues(ds: DocSettings, isFirst: boolean) {
+  return isFirst && ds.specialFirstPage
+    ? [ds.firstFooterLeft, ds.firstFooterCenter, ds.firstFooterRight]
+    : [ds.footerLeft,      ds.footerCenter,      ds.footerRight]
+}
+
 export default function PagePreview({
-  content, fontFamily, fontSize, lineHeight, filename,
-  headerLeft = "", headerCenter = "", headerRight = "",
-  footerLeft = "", footerCenter = "", footerRight = "",
+  content, fontFamily, fontSize, lineHeight, filename, docSettings,
 }: PagePreviewProps) {
   const [html,  setHtml]  = useState("")
   const [pages, setPages] = useState<string[][]>([])
@@ -89,9 +95,8 @@ export default function PagePreview({
     })
   }, [html])
 
-  const total     = pages.length
-  const hasHeader = !!(headerLeft || headerCenter || headerRight)
-  const hasFooter = !!(footerLeft || footerCenter || footerRight)
+  const total = pages.length
+  const ds    = docSettings
 
   const metaStyle: React.CSSProperties = {
     fontSize: 9,
@@ -131,57 +136,69 @@ export default function PagePreview({
           gap:            32,
           minWidth:       A4_W + 48,
         }}>
-          {pages.map((chunks, pageIdx) => (
-            <div
-              key={pageIdx}
-              style={{
-                width:          A4_W,
-                minHeight:      A4_H,
-                background:     "#fff",
-                boxShadow:      "0 4px 40px rgba(0,0,0,0.45)",
-                display:        "flex",
-                flexDirection:  "column",
-                padding:        `${M_TOP}px ${M_RIGHT}px ${M_BOTTOM}px ${M_LEFT}px`,
-                boxSizing:      "border-box",
-              }}
-            >
-              {/* Header */}
-              <div style={{
-                height:       HEADER_ZONE,
-                display:      "flex",
-                alignItems:   "flex-end",
-                borderBottom: hasHeader ? "0.5px solid #d0d0d0" : "none",
-                paddingBottom: 5,
-                flexShrink:   0,
-              }}>
-                <span style={{ ...metaStyle, textAlign: "left"   }}>{interpolate(headerLeft,   pageIdx + 1, total, filename)}</span>
-                <span style={{ ...metaStyle, textAlign: "center" }}>{interpolate(headerCenter, pageIdx + 1, total, filename)}</span>
-                <span style={{ ...metaStyle, textAlign: "right"  }}>{interpolate(headerRight,  pageIdx + 1, total, filename)}</span>
-              </div>
+          {pages.map((chunks, pageIdx) => {
+            const isFirst = pageIdx === 0
+            const hVals   = headerValues(ds, isFirst)
+            const fVals   = footerValues(ds, isFirst)
+            const hasH    = hVals.some(Boolean)
+            const hasF    = fVals.some(Boolean)
 
-              {/* Content */}
+            return (
               <div
-                className="prose prose-light"
-                style={{ fontFamily, fontSize, lineHeight, maxWidth: "none", flex: 1 }}
-                dangerouslySetInnerHTML={{ __html: chunks.join("") }}
-              />
+                key={pageIdx}
+                style={{
+                  width:         A4_W,
+                  minHeight:     A4_H,
+                  background:    "#fff",
+                  boxShadow:     "0 4px 40px rgba(0,0,0,0.45)",
+                  display:       "flex",
+                  flexDirection: "column",
+                  padding:       `${M_TOP}px ${M_RIGHT}px ${M_BOTTOM}px ${M_LEFT}px`,
+                  boxSizing:     "border-box",
+                }}
+              >
+                {/* Header */}
+                <div style={{
+                  height:        HEADER_ZONE,
+                  display:       "flex",
+                  alignItems:    "flex-end",
+                  borderBottom:  hasH ? "0.5px solid #d0d0d0" : "none",
+                  paddingBottom: 5,
+                  flexShrink:    0,
+                }}>
+                  {hVals.map((t, i) => (
+                    <span key={i} style={{ ...metaStyle, textAlign: i === 0 ? "left" : i === 1 ? "center" : "right" }}>
+                      {interpolate(t, pageIdx + 1, total, filename)}
+                    </span>
+                  ))}
+                </div>
 
-              {/* Footer */}
-              <div style={{
-                height:     FOOTER_ZONE,
-                display:    "flex",
-                alignItems: "flex-start",
-                borderTop:  hasFooter ? "0.5px solid #d0d0d0" : "none",
-                paddingTop: 5,
-                marginTop:  4,
-                flexShrink: 0,
-              }}>
-                <span style={{ ...metaStyle, textAlign: "left"   }}>{interpolate(footerLeft,   pageIdx + 1, total, filename)}</span>
-                <span style={{ ...metaStyle, textAlign: "center" }}>{interpolate(footerCenter, pageIdx + 1, total, filename)}</span>
-                <span style={{ ...metaStyle, textAlign: "right"  }}>{interpolate(footerRight,  pageIdx + 1, total, filename)}</span>
+                {/* Content */}
+                <div
+                  className="prose prose-light"
+                  style={{ fontFamily, fontSize, lineHeight, maxWidth: "none", flex: 1 }}
+                  dangerouslySetInnerHTML={{ __html: chunks.join("") }}
+                />
+
+                {/* Footer */}
+                <div style={{
+                  height:     FOOTER_ZONE,
+                  display:    "flex",
+                  alignItems: "flex-start",
+                  borderTop:  hasF ? "0.5px solid #d0d0d0" : "none",
+                  paddingTop: 5,
+                  marginTop:  4,
+                  flexShrink: 0,
+                }}>
+                  {fVals.map((t, i) => (
+                    <span key={i} style={{ ...metaStyle, textAlign: i === 0 ? "left" : i === 1 ? "center" : "right" }}>
+                      {interpolate(t, pageIdx + 1, total, filename)}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           {pages.length === 0 && html && (
             <p style={{ color: "#888", fontFamily }}>Подготовка страниц…</p>

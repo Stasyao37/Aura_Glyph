@@ -14,6 +14,30 @@ export interface Preset {
   footerRight?:  string
 }
 
+export interface DocSettings {
+  headerLeft:         string
+  headerCenter:       string
+  headerRight:        string
+  footerLeft:         string
+  footerCenter:       string
+  footerRight:        string
+  specialFirstPage:   boolean
+  firstHeaderLeft:    string
+  firstHeaderCenter:  string
+  firstHeaderRight:   string
+  firstFooterLeft:    string
+  firstFooterCenter:  string
+  firstFooterRight:   string
+}
+
+export const DEFAULT_DOC_SETTINGS: DocSettings = {
+  headerLeft: "", headerCenter: "", headerRight: "",
+  footerLeft: "", footerCenter: "", footerRight: "",
+  specialFirstPage:  false,
+  firstHeaderLeft:   "", firstHeaderCenter:  "", firstHeaderRight:  "",
+  firstFooterLeft:   "", firstFooterCenter:  "", firstFooterRight:  "",
+}
+
 export const BUILT_IN_PRESETS: Preset[] = [
   {
     id:         "default",

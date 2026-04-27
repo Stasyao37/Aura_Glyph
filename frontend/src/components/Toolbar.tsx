@@ -8,20 +8,29 @@ import {
 } from "lucide-react"
 import type { EditorHandle } from "./Editor"
 import PresetPicker from "./PresetPicker"
-import type { Preset } from "../presets"
+import DocSettingsPanel from "./DocSettingsPanel"
+import FileMenu from "./FileMenu"
+import type { Preset, DocSettings } from "../presets"
 
 export type ViewMode = "source" | "split" | "preview"
 
 interface ToolbarProps {
-  editorRef:          RefObject<EditorHandle | null>
-  viewMode:           ViewMode
-  onViewModeChange:   (mode: ViewMode) => void
-  fontFamily:         string
-  onFontFamilyChange: (f: string) => void
-  fontSize:           string
-  onFontSizeChange:   (s: string) => void
-  activePresetId:     string
-  onApplyPreset:      (preset: Preset) => void
+  editorRef:            RefObject<EditorHandle | null>
+  viewMode:             ViewMode
+  onViewModeChange:     (mode: ViewMode) => void
+  fontFamily:           string
+  onFontFamilyChange:   (f: string) => void
+  fontSize:             string
+  onFontSizeChange:     (s: string) => void
+  activePresetId:       string
+  onApplyPreset:        (preset: Preset) => void
+  isPageMode:           boolean
+  docSettings:          DocSettings
+  onDocSettingsChange:  (s: DocSettings) => void
+  onNew:                () => void
+  onOpen:               () => void
+  onSave:               () => void
+  onSaveAs:             () => void
 }
 
 const HEADING_OPTIONS = [
@@ -59,9 +68,10 @@ export default function Toolbar({
   fontFamily, onFontFamilyChange,
   fontSize, onFontSizeChange,
   activePresetId, onApplyPreset,
+  isPageMode, docSettings, onDocSettingsChange,
+  onNew, onOpen, onSave, onSaveAs,
 }: ToolbarProps) {
   const ed = () => editorRef.current
-  const colorRef = useRef<HTMLInputElement>(null)
 
   function heading(level: string) {
     if (level === "0") { ed()?.clearLinePrefix(); return }
@@ -88,6 +98,10 @@ export default function Toolbar({
 
   return (
     <div className="flex items-center h-11 shrink-0 px-2 gap-0.5 glass-panel">
+
+      {/* File menu */}
+      <FileMenu onNew={onNew} onOpen={onOpen} onSave={onSave} onSaveAs={onSaveAs} />
+      <Sep />
 
       {/* Heading */}
       <GlassDropdown
@@ -122,11 +136,17 @@ export default function Toolbar({
       <Btn title="Курсив"       onClick={() => ed()?.wrapSelection("*",  "*")}         glow><Italic     size={14} /></Btn>
       <Btn title="Подчёркнутый" onClick={() => ed()?.wrapSelection("<u>", "</u>")}     glow><Underline  size={14} /></Btn>
 
-      {/* Color picker */}
-      <input ref={colorRef} type="color" className="hidden" onChange={onColorChange} />
-      <Btn title="Цвет текста" onClick={() => colorRef.current?.click()} glow>
+      {/* Color picker — label wraps hidden input so click всегда работает */}
+      <label
+        title="Цвет текста"
+        className="relative flex items-center justify-center w-7 h-7 rounded-md shrink-0
+                   text-text-muted cursor-pointer transition-all duration-150
+                   hover:bg-white/[0.07] hover:text-text-primary active:scale-95
+                   hover:shadow-[0_0_10px_rgba(30,64,175,0.4)] hover:border hover:border-accent/30"
+      >
         <Palette size={14} />
-      </Btn>
+        <input type="color" className="sr-only" onChange={onColorChange} />
+      </label>
 
       <Sep />
 
@@ -153,6 +173,12 @@ export default function Toolbar({
 
       {/* Right side */}
       <div className="ml-auto flex items-center gap-1">
+        {isPageMode && (
+          <>
+            <DocSettingsPanel docSettings={docSettings} onChange={onDocSettingsChange} />
+            <Sep />
+          </>
+        )}
         <PresetPicker activePresetId={activePresetId} onApply={onApplyPreset} />
         <Sep />
         {/* View mode toggle */}

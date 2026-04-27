@@ -4,7 +4,7 @@ import Toolbar, { type ViewMode } from "./components/Toolbar"
 import Editor, { type EditorHandle } from "./components/Editor"
 import Preview from "./components/Preview"
 import PagePreview from "./components/PagePreview"
-import { BUILT_IN_PRESETS, type Preset } from "./presets"
+import { BUILT_IN_PRESETS, DEFAULT_DOC_SETTINGS, type Preset, type DocSettings } from "./presets"
 import {
   OpenFileWithDialog,
   SaveFile,
@@ -44,6 +44,7 @@ export default function App() {
   const [fontSize,       setFontSize]       = useState("14px")
   const [lineHeight,     setLineHeight]     = useState("1.8")
   const [activePresetId, setActivePresetId] = useState("default")
+  const [docSettings,    setDocSettings]    = useState<DocSettings>(DEFAULT_DOC_SETTINGS)
 
   const editorRef    = useRef<EditorHandle>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -52,8 +53,10 @@ export default function App() {
   // (хендлеры создаются один раз — без рефов был бы stale closure)
   const contentRef  = useRef(content)
   const filePathRef = useRef(filePath)
+  const isDirtyRef  = useRef(isDirty)
   useEffect(() => { contentRef.current  = content  }, [content])
   useEffect(() => { filePathRef.current = filePath }, [filePath])
+  useEffect(() => { isDirtyRef.current  = isDirty  }, [isDirty])
 
   const filename = filePath ? filePath.split("/").pop()! : "untitled.md"
 
@@ -61,6 +64,13 @@ export default function App() {
     setContent(val)
     setIsDirty(true)
   }
+
+  const handleNew = useCallback(() => {
+    if (isDirtyRef.current && !confirm("Есть несохранённые изменения. Создать новый документ?")) return
+    setContent("")
+    setFilePath(null)
+    setIsDirty(false)
+  }, [])
 
   const handleOpen = useCallback(async () => {
     const result = await OpenFileWithDialog()
@@ -95,18 +105,29 @@ export default function App() {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (!e.ctrlKey) return
-      if (e.key === "o") { e.preventDefault(); handleOpen() }
-      if (e.key === "s") { e.preventDefault(); e.shiftKey ? handleSaveAs() : handleSave() }
+      const k = e.key.toLowerCase()
+      if (k === "n") { e.preventDefault(); handleNew() }
+      if (k === "o") { e.preventDefault(); handleOpen() }
+      if (k === "s") { e.preventDefault(); e.shiftKey ? handleSaveAs() : handleSave() }
     }
     document.addEventListener("keydown", onKeyDown)
     return () => document.removeEventListener("keydown", onKeyDown)
-  }, [handleOpen, handleSave, handleSaveAs])
+  }, [handleNew, handleOpen, handleSave, handleSaveAs])
 
   function handleApplyPreset(preset: Preset) {
     setFontFamily(preset.fontFamily)
     setFontSize(preset.fontSize)
     setLineHeight(preset.lineHeight)
     setActivePresetId(preset.id)
+    setDocSettings({
+      ...DEFAULT_DOC_SETTINGS,
+      headerLeft:   preset.headerLeft   ?? "",
+      headerCenter: preset.headerCenter ?? "",
+      headerRight:  preset.headerRight  ?? "",
+      footerLeft:   preset.footerLeft   ?? "",
+      footerCenter: preset.footerCenter ?? "",
+      footerRight:  preset.footerRight  ?? "",
+    })
   }
 
   function handleDividerMouseDown(e: React.MouseEvent) {
@@ -157,6 +178,13 @@ export default function App() {
           onFontSizeChange={setFontSize}
           activePresetId={activePresetId}
           onApplyPreset={handleApplyPreset}
+          isPageMode={isPageMode}
+          docSettings={docSettings}
+          onDocSettingsChange={setDocSettings}
+          onNew={handleNew}
+          onOpen={handleOpen}
+          onSave={handleSave}
+          onSaveAs={handleSaveAs}
         />
       </div>
 
@@ -188,12 +216,7 @@ export default function App() {
                 fontSize={fontSize}
                 lineHeight={lineHeight}
                 filename={filename}
-                headerLeft={activePreset.headerLeft}
-                headerCenter={activePreset.headerCenter}
-                headerRight={activePreset.headerRight}
-                footerLeft={activePreset.footerLeft}
-                footerCenter={activePreset.footerCenter}
-                footerRight={activePreset.footerRight}
+                docSettings={docSettings}
               />
             ) : (
               <Preview
