@@ -191,3 +191,24 @@ body {
 }
 .prose tr:last-child td { border-bottom: none; }
 .prose tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+/* ── Prose light — overrides for white page background ── */
+.prose-light                { color: #1a1a1a; }
+.prose-light h1,
+.prose-light h2,
+.prose-light h3,
+.prose-light h4             { color: #111; }
+.prose-light h1             { border-bottom-color: rgba(0,0,0,0.10); }
+.prose-light h2             { border-bottom-color: rgba(0,0,0,0.07); }
+.prose-light strong         { color: #111; }
+.prose-light em             { color: #333; }
+.prose-light code           { color: #6d28d9; background: rgba(109,40,217,0.07); border-color: rgba(109,40,217,0.15); }
+.prose-light pre            { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
+.prose-light pre code       { color: #1a1a1a; background: none; border: none; }
+.prose-light blockquote     { color: #555; background: rgba(30,64,175,0.04); }
+.prose-light hr             { border-top-color: rgba(0,0,0,0.10); }
+.prose-light th             { color: #111; border-bottom-color: rgba(0,0,0,0.12); }
+.prose-light td             { border-bottom-color: rgba(0,0,0,0.06); }
+.prose-light tr:hover td    { background: rgba(0,0,0,0.02); }
+.prose-light ul li::marker  { color: #1e40af; }
+.prose-light ol li::marker  { color: #666; }

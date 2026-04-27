@@ -3,7 +3,8 @@ import TitleBar from "./components/TitleBar"
 import Toolbar, { type ViewMode } from "./components/Toolbar"
 import Editor, { type EditorHandle } from "./components/Editor"
 import Preview from "./components/Preview"
-import { type Preset } from "./presets"
+import PagePreview from "./components/PagePreview"
+import { BUILT_IN_PRESETS, type Preset } from "./presets"
 import {
   OpenFileWithDialog,
   SaveFile,
@@ -123,6 +124,9 @@ export default function App() {
     document.addEventListener("mouseup", onUp)
   }
 
+  const activePreset = BUILT_IN_PRESETS.find(p => p.id === activePresetId) ?? BUILT_IN_PRESETS[0]
+  const isPageMode   = activePreset.pageMode === true
+
   const showEditor  = viewMode === "source" || viewMode === "split"
   const showPreview = viewMode === "preview" || viewMode === "split"
   const showDivider = viewMode === "split"
@@ -177,12 +181,28 @@ export default function App() {
 
         {showPreview && (
           <div className="flex flex-col flex-1 overflow-hidden min-w-0">
-            <Preview
-              content={content}
-              fontFamily={fontFamily}
-              fontSize={fontSize}
-              lineHeight={lineHeight}
-            />
+            {isPageMode ? (
+              <PagePreview
+                content={content}
+                fontFamily={fontFamily}
+                fontSize={fontSize}
+                lineHeight={lineHeight}
+                filename={filename}
+                headerLeft={activePreset.headerLeft}
+                headerCenter={activePreset.headerCenter}
+                headerRight={activePreset.headerRight}
+                footerLeft={activePreset.footerLeft}
+                footerCenter={activePreset.footerCenter}
+                footerRight={activePreset.footerRight}
+              />
+            ) : (
+              <Preview
+                content={content}
+                fontFamily={fontFamily}
+                fontSize={fontSize}
+                lineHeight={lineHeight}
+              />
+            )}
           </div>
         )}
       </main>

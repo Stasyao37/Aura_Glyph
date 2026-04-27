@@ -1,10 +1,17 @@
 export interface Preset {
-  id:          string
-  name:        string
-  sample:      string
-  fontFamily:  string
-  fontSize:    string
-  lineHeight:  string
+  id:            string
+  name:          string
+  sample:        string
+  fontFamily:    string
+  fontSize:      string
+  lineHeight:    string
+  pageMode?:     boolean
+  headerLeft?:   string
+  headerCenter?: string
+  headerRight?:  string
+  footerLeft?:   string
+  footerCenter?: string
+  footerRight?:  string
 }
 
 export const BUILT_IN_PRESETS: Preset[] = [
@@ -17,12 +24,14 @@ export const BUILT_IN_PRESETS: Preset[] = [
     lineHeight: "1.8",
   },
   {
-    id:         "gost",
-    name:       "ГОСТ 7.32",
-    sample:     "Times New Roman · 14px · 1.5",
-    fontFamily: "'Times New Roman', Times, serif",
-    fontSize:   "14px",
-    lineHeight: "1.5",
+    id:           "gost",
+    name:         "ГОСТ 7.32",
+    sample:       "Times New Roman · 14px · 1.5",
+    fontFamily:   "'Times New Roman', Times, serif",
+    fontSize:     "14px",
+    lineHeight:   "1.5",
+    pageMode:     true,
+    footerCenter: "Страница {page} из {total}",
   },
   {
     id:         "academic",
@@ -31,6 +40,9 @@ export const BUILT_IN_PRESETS: Preset[] = [
     fontFamily: "Georgia, serif",
     fontSize:   "16px",
     lineHeight: "2.0",
+    pageMode:   true,
+    headerRight: "{filename}",
+    footerCenter: "{page}",
   },
   {
     id:         "focus",
