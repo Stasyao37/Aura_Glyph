@@ -14,11 +14,7 @@ const noDrag = { "--wails-draggable": "no-drag" } as React.CSSProperties
 
 export default function TitleBar({ filename, isDirty }: TitleBarProps) {
   return (
-    <header
-      className="relative flex items-center h-10 shrink-0
-                 bg-[#101012]/80 backdrop-blur-xl
-                 border-b border-white/[0.06]"
-    >
+    <header className="relative flex items-center h-10 shrink-0 glass-panel">
       {/* Subtle accent line at top */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1E40AF]/60 to-transparent" />
 

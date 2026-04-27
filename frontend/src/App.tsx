@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import TitleBar from "./components/TitleBar"
-import Editor from "./components/Editor"
+import Toolbar, { type ViewMode } from "./components/Toolbar"
+import Editor, { type EditorHandle } from "./components/Editor"
+import Preview from "./components/Preview"
 
 const PLACEHOLDER = `# Привет, Aura Glyph
 
@@ -8,40 +10,113 @@ const PLACEHOLDER = `# Привет, Aura Glyph
 
 ## Возможности
 
-- Подсветка синтаксиса
-- Живой *предпросмотр* (скоро)
+- Подсветка синтаксиса в редакторе
+- Живой *предпросмотр* справа
 - Пресеты оформления (скоро)
 
-\`\`\`ts
-const greet = (name: string) => \`Hello, \${name}\`
-\`\`\`
+### Таблица
+
+| Колонка     | Значение |
+|-------------|----------|
+| Строка 1    | данные   |
+| Строка 2    | данные   |
+
+> Это цитата с акцентным синим бордером.
 `
 
+// TitleBar 40px + Toolbar 44px
+const HEADER_H = 84
+
 export default function App() {
-  const [content, setContent] = useState(PLACEHOLDER)
-  const [isDirty, setIsDirty]  = useState(false)
+  const [content,    setContent]    = useState(PLACEHOLDER)
+  const [isDirty,    setIsDirty]    = useState(false)
+  const [splitPct,   setSplitPct]   = useState(50)
+  const [viewMode,   setViewMode]   = useState<ViewMode>("split")
+  const [fontFamily, setFontFamily] = useState("Inter, system-ui, sans-serif")
+  const [fontSize,   setFontSize]   = useState("14px")
+
+  const editorRef    = useRef<EditorHandle>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   function handleChange(val: string) {
     setContent(val)
     setIsDirty(true)
   }
 
+  function handleDividerMouseDown(e: React.MouseEvent) {
+    e.preventDefault()
+    function onMove(ev: MouseEvent) {
+      if (!containerRef.current) return
+      const rect = containerRef.current.getBoundingClientRect()
+      setSplitPct(Math.min(80, Math.max(20, ((ev.clientX - rect.left) / rect.width) * 100)))
+    }
+    function onUp() {
+      document.removeEventListener("mousemove", onMove)
+      document.removeEventListener("mouseup", onUp)
+    }
+    document.addEventListener("mousemove", onMove)
+    document.addEventListener("mouseup", onUp)
+  }
+
+  const showEditor  = viewMode === "source" || viewMode === "split"
+  const showPreview = viewMode === "preview" || viewMode === "split"
+  const showDivider = viewMode === "split"
+
   return (
-    <div className="flex flex-col h-screen bg-[#101012] overflow-hidden">
-      <TitleBar filename="untitled.md" isDirty={isDirty} />
+    <div className="relative h-screen bg-bg-deep overflow-hidden">
 
-      <main className="flex flex-1 overflow-hidden">
-        {/* Editor pane */}
-        <div className="flex flex-col flex-1 min-w-0 border-r border-white/5">
-          <Editor value={content} onChange={handleChange} />
-        </div>
+      {/* ── Ambient background glows — radial-gradient, zero blur cost ── */}
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{ background: `
+          radial-gradient(ellipse 55% 45% at 0% 0%,   rgba(59,130,246,0.13) 0%, transparent 100%),
+          radial-gradient(ellipse 45% 40% at 100% 0%, rgba(124,58,237,0.10) 0%, transparent 100%),
+          radial-gradient(ellipse 50% 35% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%)
+        `}}
+      />
 
-        {/* Preview pane — шаг 5 */}
-        <div className="flex flex-col w-[45%] shrink-0 items-center justify-center">
-          <p className="text-[#3A3A4A] text-xs tracking-widest uppercase select-none">
-            Preview · шаг 5
-          </p>
-        </div>
+      {/* ── Fixed glass header (контент скроллится ПОД ними) ── */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <TitleBar filename="untitled.md" isDirty={isDirty} />
+        <Toolbar
+          editorRef={editorRef}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          fontFamily={fontFamily}
+          onFontFamilyChange={setFontFamily}
+          fontSize={fontSize}
+          onFontSizeChange={setFontSize}
+        />
+      </div>
+
+      {/* ── Main — контент начинается НИЖЕ фиксированного хедера ── */}
+      <main ref={containerRef} className="flex h-screen overflow-hidden select-none" style={{ paddingTop: HEADER_H }}>
+        {showEditor && (
+          <div
+            style={{ width: showDivider ? `${splitPct}%` : "100%" }}
+            className="flex flex-col overflow-hidden shrink-0"
+          >
+            <Editor ref={editorRef} value={content} onChange={handleChange} />
+          </div>
+        )}
+
+        {showDivider && (
+          <div
+            onMouseDown={handleDividerMouseDown}
+            className="w-px bg-white/5 hover:bg-accent/50 hover:w-0.5
+                       transition-colors duration-150 cursor-col-resize shrink-0 z-10"
+          />
+        )}
+
+        {showPreview && (
+          <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+            <Preview
+              content={content}
+              fontFamily={fontFamily}
+              fontSize={fontSize}
+            />
+          </div>
+        )}
       </main>
     </div>
   )
