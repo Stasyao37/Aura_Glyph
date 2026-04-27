@@ -1,12 +1,14 @@
-import { useRef, type RefObject } from "react"
+import { useEffect, useRef, useState, type RefObject } from "react"
 import {
   Bold, Italic, Underline,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
   List, ListOrdered,
   Link, Table, FileDown,
-  Code2, Columns2, Eye, Palette,
+  Code2, Columns2, Eye, Palette, ChevronDown,
 } from "lucide-react"
 import type { EditorHandle } from "./Editor"
+import PresetPicker from "./PresetPicker"
+import type { Preset } from "../presets"
 
 export type ViewMode = "source" | "split" | "preview"
 
@@ -18,7 +20,32 @@ interface ToolbarProps {
   onFontFamilyChange: (f: string) => void
   fontSize:           string
   onFontSizeChange:   (s: string) => void
+  activePresetId:     string
+  onApplyPreset:      (preset: Preset) => void
 }
+
+const HEADING_OPTIONS = [
+  { value: "0", label: "Параграф" },
+  { value: "1", label: "Заголовок 1" },
+  { value: "2", label: "Заголовок 2" },
+  { value: "3", label: "Заголовок 3" },
+  { value: "4", label: "Заголовок 4" },
+]
+
+const FONT_FAMILY_OPTIONS = [
+  { value: "Inter, system-ui, sans-serif",   label: "Sans-serif" },
+  { value: "'Times New Roman', Times, serif", label: "Times New Roman" },
+  { value: "Arial, Helvetica, sans-serif",   label: "Arial" },
+  { value: "Georgia, serif",                 label: "Georgia" },
+]
+
+const FONT_SIZE_OPTIONS = [
+  { value: "12px", label: "12pt" },
+  { value: "13px", label: "13pt" },
+  { value: "14px", label: "14pt" },
+  { value: "15px", label: "15pt" },
+  { value: "16px", label: "16pt" },
+]
 
 const TABLE_TEMPLATE = `
 | Заголовок 1 | Заголовок 2 | Заголовок 3 |
@@ -31,6 +58,7 @@ export default function Toolbar({
   editorRef, viewMode, onViewModeChange,
   fontFamily, onFontFamilyChange,
   fontSize, onFontSizeChange,
+  activePresetId, onApplyPreset,
 }: ToolbarProps) {
   const ed = () => editorRef.current
   const colorRef = useRef<HTMLInputElement>(null)
@@ -62,31 +90,30 @@ export default function Toolbar({
     <div className="flex items-center h-11 shrink-0 px-2 gap-0.5 glass-panel">
 
       {/* Heading */}
-      <GlassSelect value="0" onChange={(e) => heading(e.target.value)} style={{ minWidth: 96 }}>
-        <option value="0">Параграф</option>
-        <option value="1">Заголовок 1</option>
-        <option value="2">Заголовок 2</option>
-        <option value="3">Заголовок 3</option>
-        <option value="4">Заголовок 4</option>
-      </GlassSelect>
+      <GlassDropdown
+        value="0"
+        onChange={(val) => heading(val)}
+        options={HEADING_OPTIONS}
+        style={{ minWidth: 104 }}
+      />
 
       <Sep />
 
       {/* Font family */}
-      <GlassSelect value={fontFamily} onChange={(e) => onFontFamilyChange(e.target.value)} style={{ minWidth: 110 }}>
-        <option value="Inter, system-ui, sans-serif">Sans-serif</option>
-        <option value="'Times New Roman', Times, serif">Times New Roman</option>
-        <option value="Arial, Helvetica, sans-serif">Arial</option>
-        <option value="Georgia, serif">Georgia</option>
-      </GlassSelect>
+      <GlassDropdown
+        value={fontFamily}
+        onChange={onFontFamilyChange}
+        options={FONT_FAMILY_OPTIONS}
+        style={{ minWidth: 118 }}
+      />
 
       {/* Font size */}
-      <GlassSelect value={fontSize} onChange={(e) => onFontSizeChange(e.target.value)} style={{ minWidth: 62 }}>
-        <option value="12px">12pt</option>
-        <option value="13px">13pt</option>
-        <option value="14px">14pt</option>
-        <option value="16px">16pt</option>
-      </GlassSelect>
+      <GlassDropdown
+        value={fontSize}
+        onChange={onFontSizeChange}
+        options={FONT_SIZE_OPTIONS}
+        style={{ minWidth: 66 }}
+      />
 
       <Sep />
 
@@ -126,6 +153,8 @@ export default function Toolbar({
 
       {/* Right side */}
       <div className="ml-auto flex items-center gap-1">
+        <PresetPicker activePresetId={activePresetId} onApply={onApplyPreset} />
+        <Sep />
         {/* View mode toggle */}
         <div className="flex items-center rounded-lg border border-white/8 overflow-hidden
                         shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
@@ -150,25 +179,70 @@ function Sep() {
   return <div className="w-px h-5 bg-white/[0.07] mx-1 shrink-0" />
 }
 
-function GlassSelect({ children, value, onChange, style }: {
-  children: React.ReactNode
-  value: string
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
-  style?: React.CSSProperties
+function GlassDropdown({ value, onChange, options, style }: {
+  value:   string
+  onChange: (value: string) => void
+  options: { value: string; label: string }[]
+  style?:  React.CSSProperties
 }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function onDown(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", onDown)
+    return () => document.removeEventListener("mousedown", onDown)
+  }, [open])
+
+  const label = options.find(o => o.value === value)?.label ?? value
+
   return (
-    <select
-      value={value}
-      onChange={onChange}
-      style={style}
-      className="h-7 px-2 rounded-md text-[11px] text-text-muted
-                 bg-white/4 border border-white/[0.07] cursor-pointer
-                 hover:bg-white/[0.07] hover:text-text-primary
-                 focus:outline-none transition-colors appearance-none
-                 [&>option]:bg-bg-surface [&>option]:text-text-primary"
-    >
-      {children}
-    </select>
+    <div className="relative shrink-0" ref={rootRef} style={style}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        className={`
+          flex items-center justify-between gap-1 w-full h-7 px-2 rounded-md text-[11px]
+          border transition-all duration-150
+          ${open
+            ? "bg-accent/15 text-text-primary border-accent/25"
+            : "bg-white/4 text-text-muted border-white/[0.07] hover:bg-white/[0.07] hover:text-text-primary"
+          }
+        `}
+      >
+        <span className="truncate">{label}</span>
+        <ChevronDown size={10} className="shrink-0 opacity-40" />
+      </button>
+
+      {open && (
+        <div
+          className="absolute top-full left-0 mt-1.5 min-w-full z-200
+                     rounded-xl border border-white/8
+                     shadow-[0_8px_32px_rgba(0,0,0,0.55)] overflow-hidden"
+          style={{ background: "rgba(12,12,18,0.95)", backdropFilter: "blur(20px)" }}
+        >
+          <div className="p-1 flex flex-col gap-px">
+            {options.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => { onChange(opt.value); setOpen(false) }}
+                className={`
+                  w-full text-left px-3 py-1.5 rounded-lg text-[11px] transition-colors duration-100
+                  ${opt.value === value
+                    ? "bg-accent/15 text-accent-light"
+                    : "text-text-muted hover:bg-white/[0.06] hover:text-text-primary"
+                  }
+                `}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
 

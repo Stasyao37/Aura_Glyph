@@ -62,10 +62,11 @@ wails dev
 # Сборка готового бинарника
 wails build
 ```
-🤝 Контрибьютинг
+##🤝 Контрибьютинг
 
 Идеи по развитию экосистемы Aura приветствуются! Если у вас есть крутой пресет разметки или предложение по UI — открывайте Issue или Pull Request.
-👤 Автор
+
+##👤 Автор
 
 Stanislav Kapitonov Student of MSTU Stankin | Go Developer | Linux Enthusiast
 

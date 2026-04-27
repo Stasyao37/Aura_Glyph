@@ -1,8 +1,14 @@
-import { useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import TitleBar from "./components/TitleBar"
 import Toolbar, { type ViewMode } from "./components/Toolbar"
 import Editor, { type EditorHandle } from "./components/Editor"
 import Preview from "./components/Preview"
+import { type Preset } from "./presets"
+import {
+  OpenFileWithDialog,
+  SaveFile,
+  SaveFileWithDialog,
+} from "../wailsjs/go/main/App"
 
 const PLACEHOLDER = `# Привет, Aura Glyph
 
@@ -30,17 +36,76 @@ const HEADER_H = 84
 export default function App() {
   const [content,    setContent]    = useState(PLACEHOLDER)
   const [isDirty,    setIsDirty]    = useState(false)
+  const [filePath,   setFilePath]   = useState<string | null>(null)
   const [splitPct,   setSplitPct]   = useState(50)
   const [viewMode,   setViewMode]   = useState<ViewMode>("split")
-  const [fontFamily, setFontFamily] = useState("Inter, system-ui, sans-serif")
-  const [fontSize,   setFontSize]   = useState("14px")
+  const [fontFamily,     setFontFamily]     = useState("Inter, system-ui, sans-serif")
+  const [fontSize,       setFontSize]       = useState("14px")
+  const [lineHeight,     setLineHeight]     = useState("1.8")
+  const [activePresetId, setActivePresetId] = useState("default")
 
   const editorRef    = useRef<EditorHandle>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Рефы нужны чтобы хоткеи всегда видели актуальные значения
+  // (хендлеры создаются один раз — без рефов был бы stale closure)
+  const contentRef  = useRef(content)
+  const filePathRef = useRef(filePath)
+  useEffect(() => { contentRef.current  = content  }, [content])
+  useEffect(() => { filePathRef.current = filePath }, [filePath])
+
+  const filename = filePath ? filePath.split("/").pop()! : "untitled.md"
+
   function handleChange(val: string) {
     setContent(val)
     setIsDirty(true)
+  }
+
+  const handleOpen = useCallback(async () => {
+    const result = await OpenFileWithDialog()
+    if (!result) return
+    setContent(result.content)
+    setFilePath(result.path || null)
+    setIsDirty(false)
+  }, [])
+
+  const handleSaveAs = useCallback(async () => {
+    const newPath = await SaveFileWithDialog(contentRef.current, filePathRef.current ?? "")
+    if (newPath) {
+      setFilePath(newPath)
+      setIsDirty(false)
+    }
+  }, [])
+
+  const handleSave = useCallback(async () => {
+    if (filePathRef.current) {
+      await SaveFile(filePathRef.current, contentRef.current)
+      setIsDirty(false)
+    } else {
+      // Ещё нет пути — показываем "Сохранить как"
+      const newPath = await SaveFileWithDialog(contentRef.current, "")
+      if (newPath) {
+        setFilePath(newPath)
+        setIsDirty(false)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (!e.ctrlKey) return
+      if (e.key === "o") { e.preventDefault(); handleOpen() }
+      if (e.key === "s") { e.preventDefault(); e.shiftKey ? handleSaveAs() : handleSave() }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [handleOpen, handleSave, handleSaveAs])
+
+  function handleApplyPreset(preset: Preset) {
+    setFontFamily(preset.fontFamily)
+    setFontSize(preset.fontSize)
+    setLineHeight(preset.lineHeight)
+    setActivePresetId(preset.id)
   }
 
   function handleDividerMouseDown(e: React.MouseEvent) {
@@ -77,7 +142,7 @@ export default function App() {
 
       {/* ── Fixed glass header (контент скроллится ПОД ними) ── */}
       <div className="fixed top-0 left-0 right-0 z-50">
-        <TitleBar filename="untitled.md" isDirty={isDirty} />
+        <TitleBar filename={filename} isDirty={isDirty} />
         <Toolbar
           editorRef={editorRef}
           viewMode={viewMode}
@@ -86,6 +151,8 @@ export default function App() {
           onFontFamilyChange={setFontFamily}
           fontSize={fontSize}
           onFontSizeChange={setFontSize}
+          activePresetId={activePresetId}
+          onApplyPreset={handleApplyPreset}
         />
       </div>
 
@@ -114,6 +181,7 @@ export default function App() {
               content={content}
               fontFamily={fontFamily}
               fontSize={fontSize}
+              lineHeight={lineHeight}
             />
           </div>
         )}

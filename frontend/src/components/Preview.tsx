@@ -5,9 +5,10 @@ interface PreviewProps {
   content:    string
   fontFamily: string
   fontSize:   string
+  lineHeight: string
 }
 
-export default function Preview({ content, fontFamily, fontSize }: PreviewProps) {
+export default function Preview({ content, fontFamily, fontSize, lineHeight }: PreviewProps) {
   const [html, setHtml] = useState("")
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -27,7 +28,7 @@ export default function Preview({ content, fontFamily, fontSize }: PreviewProps)
     <div className="h-full overflow-y-auto">
       <div
         className="prose mx-auto px-8 pb-6"
-        style={{ fontFamily, fontSize, paddingTop: 24 }}
+        style={{ fontFamily, fontSize, lineHeight, paddingTop: 24 }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
