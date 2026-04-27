@@ -51,8 +51,21 @@ export default function PagePreview({
 }: PagePreviewProps) {
   const [html,  setHtml]  = useState("")
   const [pages, setPages] = useState<string[][]>([])
-  const measureRef = useRef<HTMLDivElement>(null)
-  const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [scale, setScale] = useState(1)
+  const measureRef  = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const timerRef    = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const el = viewportRef.current
+    if (!el) return
+    const obs = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width
+      setScale(Math.min(1, w / (A4_W + 48)))
+    })
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   // Debounced markdown → HTML (same pattern as Preview)
   useEffect(() => {
@@ -127,15 +140,15 @@ export default function PagePreview({
       />
 
       {/* ── Page viewport ── */}
-      <div className="h-full overflow-auto" style={{ background: "#101014" }}>
+      <div ref={viewportRef} className="h-full overflow-auto" style={{ background: "#101014" }}>
         <div style={{
           display:        "flex",
           flexDirection:  "column",
           alignItems:     "center",
-          padding:        "40px 24px",
+          padding:        "124px 24px 40px",
           gap:            32,
-          minWidth:       A4_W + 48,
-        }}>
+          zoom:           scale,
+        } as React.CSSProperties}>
           {pages.map((chunks, pageIdx) => {
             const isFirst = pageIdx === 0
             const hVals   = headerValues(ds, isFirst)

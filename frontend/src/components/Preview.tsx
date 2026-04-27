@@ -28,7 +28,7 @@ export default function Preview({ content, fontFamily, fontSize, lineHeight }: P
     <div className="h-full overflow-y-auto">
       <div
         className="prose mx-auto px-8 pb-6"
-        style={{ fontFamily, fontSize, lineHeight, paddingTop: 24 }}
+        style={{ fontFamily, fontSize, lineHeight, paddingTop: 108 }}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>

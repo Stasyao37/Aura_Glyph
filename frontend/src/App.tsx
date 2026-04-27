@@ -19,7 +19,7 @@ const PLACEHOLDER = `# Привет, Aura Glyph
 
 - Подсветка синтаксиса в редакторе
 - Живой *предпросмотр* справа
-- Пресеты оформления (скоро)
+- Пресеты оформления
 
 ### Таблица
 
@@ -31,8 +31,6 @@ const PLACEHOLDER = `# Привет, Aura Glyph
 > Это цитата с акцентным синим бордером.
 `
 
-// TitleBar 40px + Toolbar 44px
-const HEADER_H = 84
 
 export default function App() {
   const [content,    setContent]    = useState(PLACEHOLDER)
@@ -155,18 +153,38 @@ export default function App() {
   return (
     <div className="relative h-screen bg-bg-deep overflow-hidden">
 
-      {/* ── Ambient background glows — radial-gradient, zero blur cost ── */}
+      {/* ── Ambient background glows (subtle, not blurred) ── */}
       <div
         className="pointer-events-none fixed inset-0"
         style={{ background: `
-          radial-gradient(ellipse 55% 45% at 0% 0%,   rgba(59,130,246,0.13) 0%, transparent 100%),
-          radial-gradient(ellipse 45% 40% at 100% 0%, rgba(124,58,237,0.10) 0%, transparent 100%),
-          radial-gradient(ellipse 50% 35% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%)
+          radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(59,130,246,0.20) 0%, transparent 100%),
+          radial-gradient(ellipse 40% 45% at 0% 0%,    rgba(30,64,175,0.16)  0%, transparent 100%),
+          radial-gradient(ellipse 35% 40% at 100% 0%,  rgba(124,58,237,0.12) 0%, transparent 100%),
+          radial-gradient(ellipse 50% 30% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%)
         `}}
       />
 
-      {/* ── Fixed glass header (контент скроллится ПОД ними) ── */}
-      <div className="fixed top-0 left-0 right-0 z-50">
+      {/* ── Fixed matte panel: webkit2gtk не вытягивает backdrop-filter из    */}
+      {/* вложенных scroll-контейнеров, поэтому делаем плотное матовое стекло   */}
+      {/* — почти непрозрачное, контент за ним не просвечивает. Цветной налив   */}
+      {/* и мягкие блики живут внутри background, тень снизу даёт глубину.      */}
+      <div
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{
+          background: `
+            radial-gradient(ellipse 90% 200% at 50% 0%,   rgba(59,130,246,0.14) 0%, transparent 65%),
+            radial-gradient(ellipse 60% 200% at 0% 0%,    rgba(30,64,175,0.12)  0%, transparent 65%),
+            radial-gradient(ellipse 55% 200% at 100% 0%,  rgba(124,58,237,0.10) 0%, transparent 65%),
+            linear-gradient(180deg, rgba(20,20,26,0.98) 0%, rgba(12,12,16,0.97) 100%)
+          `,
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          boxShadow: `
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            0 1px 0 rgba(0,0,0,0.4),
+            0 12px 24px -8px rgba(0,0,0,0.55)
+          `,
+        }}
+      >
         <TitleBar filename={filename} isDirty={isDirty} />
         <Toolbar
           editorRef={editorRef}
@@ -188,8 +206,8 @@ export default function App() {
         />
       </div>
 
-      {/* ── Main — контент начинается НИЖЕ фиксированного хедера ── */}
-      <main ref={containerRef} className="flex h-screen overflow-hidden select-none" style={{ paddingTop: HEADER_H }}>
+      {/* ── Main — занимает весь экран, контент уходит под стеклянный хедер ── */}
+      <main ref={containerRef} className="flex h-screen overflow-hidden select-none">
         {showEditor && (
           <div
             style={{ width: showDivider ? `${splitPct}%` : "100%" }}

@@ -97,7 +97,7 @@ export default function Toolbar({
   }
 
   return (
-    <div className="flex items-center h-11 shrink-0 px-2 gap-0.5 glass-panel">
+    <div className="flex items-center h-11 shrink-0 px-2 gap-0.5">
 
       {/* File menu */}
       <FileMenu onNew={onNew} onOpen={onOpen} onSave={onSave} onSaveAs={onSaveAs} />

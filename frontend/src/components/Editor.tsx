@@ -14,6 +14,54 @@ export interface EditorHandle {
   insertAtCursor(text: string): void
 }
 
+function toggleWrap(view: EditorView, before: string, after: string): boolean {
+  const { from, to } = view.state.selection.main
+  const doc = view.state.doc
+  const hasSelection = from !== to
+
+  if (hasSelection) {
+    const selected = doc.sliceString(from, to)
+    // Case 1: selection already includes the markers themselves
+    if (
+      selected.startsWith(before) &&
+      selected.endsWith(after) &&
+      selected.length > before.length + after.length
+    ) {
+      const inner = selected.slice(before.length, selected.length - after.length)
+      view.dispatch({
+        changes: { from, to, insert: inner },
+        selection: { anchor: from, head: from + inner.length },
+      })
+      view.focus()
+      return true
+    }
+    // Case 2: markers sit just outside the selection
+    const prevChars = from >= before.length ? doc.sliceString(from - before.length, from) : ""
+    const nextChars = to + after.length <= doc.length ? doc.sliceString(to, to + after.length) : ""
+    if (prevChars === before && nextChars === after) {
+      view.dispatch({
+        changes: [
+          { from: from - before.length, to: from, insert: "" },
+          { from: to, to: to + after.length, insert: "" },
+        ],
+        selection: { anchor: from - before.length, head: to - before.length },
+      })
+      view.focus()
+      return true
+    }
+  }
+
+  // Default: wrap (with placeholder when no selection)
+  const text   = hasSelection ? doc.sliceString(from, to) : "текст"
+  const insert = `${before}${text}${after}`
+  view.dispatch({
+    changes: { from, to, insert },
+    selection: { anchor: from + before.length, head: from + before.length + text.length },
+  })
+  view.focus()
+  return true
+}
+
 interface EditorProps {
   value:    string
   onChange: (value: string) => void
@@ -41,7 +89,7 @@ const auraTheme = EditorView.theme({
     fontSize: "14px",
     fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
   },
-  ".cm-content": { padding: "24px 32px", caretColor: "#3B82F6", lineHeight: "1.75" },
+  ".cm-content": { paddingTop: "108px", paddingBottom: "24px", paddingLeft: "32px", paddingRight: "32px", caretColor: "#3B82F6", lineHeight: "1.75" },
   ".cm-line":    { padding: "0" },
   ".cm-cursor":  { borderLeftColor: "#3B82F6", borderLeftWidth: "2px" },
   ".cm-selectionBackground, ::selection": { backgroundColor: "rgba(30,64,175,0.3) !important" },
@@ -69,14 +117,7 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor(
     wrapSelection(before, after) {
       const view = viewRef.current
       if (!view) return
-      const { from, to } = view.state.selection.main
-      const selected = view.state.sliceDoc(from, to)
-      const insert   = `${before}${selected || "текст"}${after}`
-      view.dispatch({
-        changes: { from, to, insert },
-        selection: { anchor: from + before.length, head: from + before.length + (selected || "текст").length },
-      })
-      view.focus()
+      toggleWrap(view, before, after)
     },
 
     insertAtLineStart(prefix) {
@@ -121,7 +162,13 @@ const Editor = forwardRef<EditorHandle, EditorProps>(function Editor(
       doc: value,
       extensions: [
         history(),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        keymap.of([
+          { key: "Ctrl-b", run: (v) => toggleWrap(v, "**", "**") },
+          { key: "Ctrl-i", run: (v) => toggleWrap(v, "*",  "*")  },
+          { key: "Ctrl-u", run: (v) => toggleWrap(v, "<u>", "</u>") },
+          ...defaultKeymap,
+          ...historyKeymap,
+        ]),
         markdown({ base: markdownLanguage, codeLanguages: languages }),
         syntaxHighlighting(auraHighlight),
         EditorView.lineWrapping,
