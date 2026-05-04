@@ -1,23 +1,35 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Aura Glow Theme (Default)
+   ========================================================================== */
+
 @theme {
-  /* Background */
+  /* Base Colors */
   --color-bg-deep:    #101012;
   --color-bg-surface: #18181c;
   --color-bg-raised:  #1e1e22;
-
-  /* Accent — Aura Glyph blue */
-  --color-accent:       #1E40AF;
-  --color-accent-light: #3B82F6;
-
-  /* Aura Glow gradient endpoints */
-  --color-aura-teal:   #2DD4BF;
-  --color-aura-purple: #7C3AED;
-
-  /* Text */
   --color-text-primary: #EDEDF0;
   --color-text-muted:   #5A5A6A;
   --color-text-subtle:  #3A3A4A;
+
+  /* Accents */
+  --color-accent:       #1E40AF;
+  --color-accent-light: #3B82F6;
+
+  /* Aura Glow specific */
+  --color-aura-teal:   #2DD4BF;
+  --color-aura-purple: #7C3AED;
+  --bg-ambient: radial-gradient(ellipse 50% 30% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%);
+  --bg-header:
+    radial-gradient(ellipse 90% 200% at 50% 0%,   rgba(59,130,246,0.14) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 200% at 0% 0%,    rgba(30,64,175,0.12)  0%, transparent 65%),
+    radial-gradient(ellipse 55% 200% at 100% 0%,  rgba(124,58,237,0.10) 0%, transparent 65%),
+    linear-gradient(180deg, rgba(20,20,26,0.98) 0%, rgba(12,12,16,0.97) 100%);
+  --shadow-header:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 1px 0 rgba(0,0,0,0.4),
+    0 12px 24px -8px rgba(0,0,0,0.55);
 
   /* Glass system */
   --glass-bg:     rgba(16, 16, 18, 0.72);
@@ -28,6 +40,59 @@
   --glow-aura:   0 0 24px rgba(124, 58, 237, 0.35);
   --glow-close:  0 0 14px rgba(239, 68, 68, 0.5);
 }
+
+
+/* ==========================================================================
+   Dark Theme (Monochrome)
+   ========================================================================== */
+
+html.dark {
+  --color-bg-deep:    #101012;
+  --color-bg-surface: #18181c;
+  --color-bg-raised:  #1e1e22;
+  --color-text-primary: #EDEDF0;
+  --color-text-muted:   #5A5A6A;
+  --color-text-subtle:  #3A3A4A;
+  --color-accent:       #1E40AF;
+  --color-accent-light: #3B82F6;
+  --color-aura-teal:   #2DD4BF;
+  --color-aura-purple: #7C3AED;
+  --bg-ambient: transparent;
+  --bg-header: rgba(12,12,16,0.97);
+  --shadow-header: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 0 rgba(0,0,0,0.4);
+  --glass-bg:     rgba(16, 16, 18, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glow-accent: 0 0 18px rgba(30, 64, 175, 0.45);
+  --glow-aura:   transparent;
+  --glow-close:  0 0 14px rgba(239, 68, 68, 0.5);
+}
+
+
+/* ==========================================================================
+   Light Theme
+   ========================================================================== */
+
+html.light {
+  --color-bg-deep:    #F0F2F5;
+  --color-bg-surface: #FCFCFC;
+  --color-bg-raised:  #FFFFFF;
+  --color-text-primary: #1A1A1D;
+  --color-text-muted:   #70707A;
+  --color-text-subtle:  #90909A;
+  --color-accent:       #1E40AF;
+  --color-accent-light: #3B82F6;
+  --color-aura-teal:   #2DD4BF;
+  --color-aura-purple: #7C3AED;
+  --bg-ambient: transparent;
+  --bg-header: rgba(252,252,252,0.85);
+  --shadow-header: inset 0 -1px 0 rgba(0,0,0,0.08);
+  --glass-bg:     rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glow-accent: 0 0 16px rgba(30, 64, 175, 0.25);
+  --glow-aura:   transparent;
+  --glow-close:  0 0 14px rgba(239, 68, 68, 0.35);
+}
+
 
 /* ── Glass panel (used for dropdowns and secondary surfaces) ── */
 .glass-panel {
@@ -45,8 +110,8 @@ html, body, #root {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background-color: #101012;
-  color: #EDEDF0;
+  background-color: var(--color-bg-deep);
+  color: var(--color-text-primary);
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
