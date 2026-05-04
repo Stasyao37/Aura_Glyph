@@ -21,8 +21,7 @@ export default function TitleBar({ filename, isDirty }: TitleBarProps) {
       {/* Left — app name (not draggable so clicks register) */}
       <div className="flex items-center gap-2 px-4 w-44 shrink-0" style={noDrag}>
         <span className="text-[11px] font-semibold tracking-[0.18em] uppercase
-                         bg-gradient-to-r from-[#2DD4BF] to-[#7C3AED]
-                         bg-clip-text text-transparent select-none">
+                         text-blue-500 select-none">
           Aura Glyph
         </span>
       </div>

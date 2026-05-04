@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, lazy, Suspense } from "react"
 import TitleBar from "./components/TitleBar"
 import Toolbar, { type ViewMode } from "./components/Toolbar"
-import Editor, { type EditorHandle } from "./components/Editor"
+import type { EditorHandle } from "./components/Editor"
 import Preview from "./components/Preview"
 import PagePreview from "./components/PagePreview"
 import { BUILT_IN_PRESETS, DEFAULT_DOC_SETTINGS, type Preset, type DocSettings } from "./presets"
@@ -10,6 +10,8 @@ import {
   SaveFile,
   SaveFileWithDialog,
 } from "../wailsjs/go/main/App"
+
+const Editor = lazy(() => import("./components/Editor"))
 
 const PLACEHOLDER = `# Привет, Aura Glyph
 
@@ -157,9 +159,6 @@ export default function App() {
       <div
         className="pointer-events-none fixed inset-0"
         style={{ background: `
-          radial-gradient(ellipse 70% 35% at 50% 0%,   rgba(59,130,246,0.20) 0%, transparent 100%),
-          radial-gradient(ellipse 40% 45% at 0% 0%,    rgba(30,64,175,0.16)  0%, transparent 100%),
-          radial-gradient(ellipse 35% 40% at 100% 0%,  rgba(124,58,237,0.12) 0%, transparent 100%),
           radial-gradient(ellipse 50% 30% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%)
         `}}
       />
@@ -213,7 +212,9 @@ export default function App() {
             style={{ width: showDivider ? `${splitPct}%` : "100%" }}
             className="flex flex-col overflow-hidden shrink-0"
           >
-            <Editor ref={editorRef} value={content} onChange={handleChange} />
+            <Suspense fallback={<div className="h-full w-full bg-transparent p-8 text-text-dim">Loading Editor...</div>}>
+              <Editor ref={editorRef} value={content} onChange={handleChange} />
+            </Suspense>
           </div>
         )}
 

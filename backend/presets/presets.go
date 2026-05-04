@@ -14,7 +14,15 @@ type Preset struct {
 	Theme      string  `json:"theme"`
 }
 
-func presetsDir() (string, error) {
+// PresetsDirFunc is a function that returns the directory where presets are stored.
+// It can be overridden in tests to point to a temporary directory.
+var PresetsDirFunc func() (string, error)
+
+func init() {
+	PresetsDirFunc = defaultPresetsDir
+}
+
+func defaultPresetsDir() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err
@@ -24,7 +32,7 @@ func presetsDir() (string, error) {
 }
 
 func Load(name string) (*Preset, error) {
-	dir, err := presetsDir()
+	dir, err := PresetsDirFunc()
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +45,7 @@ func Load(name string) (*Preset, error) {
 }
 
 func Save(p *Preset) error {
-	dir, err := presetsDir()
+	dir, err := PresetsDirFunc()
 	if err != nil {
 		return err
 	}
@@ -49,7 +57,7 @@ func Save(p *Preset) error {
 }
 
 func List() ([]string, error) {
-	dir, err := presetsDir()
+	dir, err := PresetsDirFunc()
 	if err != nil {
 		return nil, err
 	}
