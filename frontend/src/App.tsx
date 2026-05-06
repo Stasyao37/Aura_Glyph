@@ -165,10 +165,10 @@ export default function App() {
 
       {/* ── Fixed matte panel ── */}
       <div
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl"
         style={{
-          background: 'var(--bg-header)',
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          background: 'var(--glass-bg)',
+          borderBottom: "1px solid var(--glass-border)",
           boxShadow: 'var(--shadow-header)',
         }}
       >
