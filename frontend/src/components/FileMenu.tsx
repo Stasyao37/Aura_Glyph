@@ -45,9 +45,9 @@ export default function FileMenu({ onNew, onOpen, onSave, onSaveAs }: FileMenuPr
 
       {open && (
         <div
-          className="absolute top-full left-0 mt-2 z-200 rounded-xl border border-white/8
-                     shadow-[0_8px_32px_rgba(0,0,0,0.55)] overflow-hidden"
-          style={{ width: 224, background: "rgba(12,12,18,0.95)", backdropFilter: "blur(20px)" }}
+          className="absolute top-full left-0 mt-2 z-200 rounded-xl border border-[var(--glass-border)]
+                     shadow-[0_8px_32px_rgba(0,0,0,0.55)] overflow-hidden bg-[var(--glass-bg)] backdrop-blur-xl"
+          style={{ width: 224 }}
         >
           <div className="p-1.5 flex flex-col">
             <Item label="Создать"        hint="Ctrl N"   onClick={() => act(onNew)}    />

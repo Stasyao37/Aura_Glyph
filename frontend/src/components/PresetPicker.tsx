@@ -44,9 +44,8 @@ export default function PresetPicker({ activePresetId, onApply }: PresetPickerPr
       {open && (
         <div
           className="absolute top-full left-0 mt-2 w-52 z-[200]
-                     rounded-xl border border-white/8
+                     rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl
                      shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
-          style={{ background: "rgba(12, 12, 18, 0.94)", backdropFilter: "blur(20px)" }}
         >
           <div className="p-1.5 flex flex-col gap-0.5">
             {BUILT_IN_PRESETS.map(preset => (
@@ -76,16 +75,16 @@ function PresetCard({ preset, active, onClick }: {
         w-full text-left px-3 py-2.5 rounded-lg transition-all duration-150
         ${active
           ? "bg-accent/15 border border-accent/25"
-          : "hover:bg-white/[0.05] border border-transparent"
+          : "hover:bg-[var(--glass-border)] border border-transparent"
         }
       `}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[12px] font-medium text-text-primary">{preset.name}</span>
-        {active && <span className="w-1.5 h-1.5 rounded-full bg-accent-light shrink-0" />}
+        <span className="text-[12px] font-medium text-[var(--color-text-primary)]">{preset.name}</span>
+        {active && <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent-light)] shrink-0" />}
       </div>
       <span
-        className="text-[11px] text-text-muted mt-0.5 block"
+        className="text-[11px] text-[var(--color-text-muted)] mt-0.5 block"
         style={{ fontFamily: preset.fontFamily }}
       >
         {preset.sample}

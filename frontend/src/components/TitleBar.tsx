@@ -22,7 +22,7 @@ export default function TitleBar({ filename, isDirty }: TitleBarProps) {
       <div className="flex items-center gap-2 px-4 w-44 shrink-0" style={noDrag}>
         <span className="text-[11px] font-semibold tracking-[0.18em] uppercase
                          text-blue-500 select-none">
-          Aura Glyph
+          alpha 0.1.1
         </span>
       </div>
 

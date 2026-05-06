@@ -10,6 +10,7 @@ import {
   SaveFile,
   SaveFileWithDialog,
 } from "../wailsjs/go/main/App"
+import { useTheme } from "./hooks/useTheme"
 
 const Editor = lazy(() => import("./components/Editor"))
 
@@ -33,12 +34,13 @@ const PLACEHOLDER = `# Привет, Aura Glyph
 > Это цитата с акцентным синим бордером.
 `
 
-
 export default function App() {
+  useTheme() // Activate theme listener
+
   const [content,    setContent]    = useState(PLACEHOLDER)
   const [isDirty,    setIsDirty]    = useState(false)
   const [filePath,   setFilePath]   = useState<string | null>(null)
-  const [splitPct,   setSplitPct]   = useState(50)
+  const [splitPct,   setSplitPct] =  useState(50)
   const [viewMode,   setViewMode]   = useState<ViewMode>("split")
   const [fontFamily,     setFontFamily]     = useState("Inter, system-ui, sans-serif")
   const [fontSize,       setFontSize]       = useState("14px")
@@ -158,30 +160,16 @@ export default function App() {
       {/* ── Ambient background glows (subtle, not blurred) ── */}
       <div
         className="pointer-events-none fixed inset-0"
-        style={{ background: `
-          radial-gradient(ellipse 50% 30% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%)
-        `}}
+        style={{ background: 'var(--bg-ambient)' }}
       />
 
-      {/* ── Fixed matte panel: webkit2gtk не вытягивает backdrop-filter из    */}
-      {/* вложенных scroll-контейнеров, поэтому делаем плотное матовое стекло   */}
-      {/* — почти непрозрачное, контент за ним не просвечивает. Цветной налив   */}
-      {/* и мягкие блики живут внутри background, тень снизу даёт глубину.      */}
+      {/* ── Fixed matte panel ── */}
       <div
-        className="fixed top-0 left-0 right-0 z-50"
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl"
         style={{
-          background: `
-            radial-gradient(ellipse 90% 200% at 50% 0%,   rgba(59,130,246,0.14) 0%, transparent 65%),
-            radial-gradient(ellipse 60% 200% at 0% 0%,    rgba(30,64,175,0.12)  0%, transparent 65%),
-            radial-gradient(ellipse 55% 200% at 100% 0%,  rgba(124,58,237,0.10) 0%, transparent 65%),
-            linear-gradient(180deg, rgba(20,20,26,0.98) 0%, rgba(12,12,16,0.97) 100%)
-          `,
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          boxShadow: `
-            inset 0 1px 0 rgba(255,255,255,0.08),
-            0 1px 0 rgba(0,0,0,0.4),
-            0 12px 24px -8px rgba(0,0,0,0.55)
-          `,
+          background: 'var(--glass-bg)',
+          borderBottom: "1px solid var(--glass-border)",
+          boxShadow: 'var(--shadow-header)',
         }}
       >
         <TitleBar filename={filename} isDirty={isDirty} />

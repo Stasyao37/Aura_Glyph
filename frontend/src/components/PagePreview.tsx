@@ -140,7 +140,7 @@ export default function PagePreview({
       />
 
       {/* ── Page viewport ── */}
-      <div ref={viewportRef} className="h-full overflow-auto" style={{ background: "#101014" }}>
+      <div ref={viewportRef} className="h-full overflow-auto" style={{ background: "var(--color-bg-deep)" }}>
         <div style={{
           display:        "flex",
           flexDirection:  "column",
