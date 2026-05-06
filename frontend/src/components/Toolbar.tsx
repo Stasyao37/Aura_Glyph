@@ -143,9 +143,10 @@ export default function Toolbar({
         <label
           title="Цвет текста"
           className="relative flex items-center justify-center w-7 h-7 rounded-md shrink-0
-                     text-text-muted cursor-pointer transition-all duration-150
-                     hover:bg-white/[0.07] hover:text-text-primary active:scale-95
-                     hover:shadow-[0_0_10px_rgba(30,64,175,0.4)] hover:border hover:border-accent/30"
+                     text-[var(--color-text-muted)] cursor-pointer transition-all duration-150
+                     border border-transparent
+                     hover:bg-[var(--glass-border)] hover:text-[var(--color-text-primary)] active:scale-95
+                     hover:shadow-[0_0_10px_rgba(30,64,175,0.4)] hover:border-accent/30"
         >
           <Palette size={14} />
           <input type="color" className="sr-only" onChange={onColorChange} />
@@ -185,7 +186,7 @@ export default function Toolbar({
           <PresetPicker activePresetId={activePresetId} onApply={onApplyPreset} />
           <Sep />
           {/* View mode toggle */}
-          <div className="flex items-center rounded-lg border border-white/8 overflow-hidden
+          <div className="flex items-center rounded-lg border border-[var(--glass-border)] overflow-hidden
                           shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
             <ViewBtn active={viewMode === "source"}  onClick={() => onViewModeChange("source")}  title="Редактор"><Code2   size={13} /></ViewBtn>
             <ViewBtn active={viewMode === "split"}   onClick={() => onViewModeChange("split")}   title="Split">  <Columns2 size={13} /></ViewBtn>
@@ -242,8 +243,8 @@ function GlassDropdown({ value, onChange, options, style }: {
           flex items-center justify-between gap-1 w-full h-7 px-2 rounded-md text-[11px]
           border transition-all duration-150
           ${open
-            ? "bg-accent/15 text-text-primary border-accent/25"
-            : "bg-white/4 text-text-muted border-white/[0.07] hover:bg-white/[0.07] hover:text-text-primary"
+            ? "bg-[var(--color-accent)]/15 text-[var(--color-text-primary)] border-[var(--color-accent)]/25"
+            : "bg-[var(--glass-bg)]/20 text-[var(--color-text-muted)] border-[var(--glass-border)] hover:bg-[var(--glass-border)] hover:text-[var(--color-text-primary)]"
           }
         `}
       >
@@ -254,9 +255,8 @@ function GlassDropdown({ value, onChange, options, style }: {
       {open && (
         <div
           className="absolute top-full left-0 mt-1.5 min-w-full z-200
-                     rounded-xl border border-white/8
+                     rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] frosted-glass-sm
                      shadow-[0_8px_32px_rgba(0,0,0,0.55)] overflow-hidden"
-          style={{ background: "rgba(12,12,18,0.95)", backdropFilter: "blur(20px)" }}
         >
           <div className="p-1 flex flex-col gap-px">
             {options.map(opt => (
@@ -266,8 +266,8 @@ function GlassDropdown({ value, onChange, options, style }: {
                 className={`
                   w-full text-left px-3 py-1.5 rounded-lg text-[11px] transition-colors duration-100
                   ${opt.value === value
-                    ? "bg-accent/15 text-accent-light"
-                    : "text-text-muted hover:bg-white/[0.06] hover:text-text-primary"
+                    ? "bg-[var(--color-accent)]/15 text-[var(--color-accent-light)]"
+                    : "text-[var(--color-text-muted)] hover:bg-[var(--glass-border)] hover:text-[var(--color-text-primary)]"
                   }
                 `}
               >
@@ -293,10 +293,11 @@ function Btn({ children, onClick, title, glow = false }: {
       title={title}
       className={`
         flex items-center justify-center w-7 h-7 rounded-md shrink-0
-        text-text-muted transition-all duration-150
-        hover:bg-white/[0.07] hover:text-text-primary active:scale-95
+        text-[var(--color-text-muted)] transition-all duration-150
+        border border-transparent
+        hover:bg-[var(--glass-border)] hover:text-[var(--color-text-primary)] active:scale-95
         ${glow
-          ? "hover:shadow-[0_0_10px_rgba(30,64,175,0.4)] hover:border hover:border-accent/30"
+          ? "hover:shadow-[0_0_10px_rgba(30,64,175,0.4)] hover:border-accent/30"
           : ""
         }
       `}
@@ -319,8 +320,8 @@ function ViewBtn({ children, active, onClick, title }: {
       className={`
         flex items-center justify-center w-7 h-7 transition-all duration-150
         ${active
-          ? "bg-accent/25 text-accent-light shadow-[0_0_12px_rgba(30,64,175,0.45)_inset]"
-          : "text-text-muted hover:bg-white/5 hover:text-text-primary"
+          ? "bg-[var(--color-accent)]/25 text-[var(--color-accent-light)] shadow-[0_0_12px_rgba(30,64,175,0.45)_inset]"
+          : "text-[var(--color-text-muted)] hover:bg-[var(--glass-border)] hover:text-[var(--color-text-primary)]"
         }
       `}
     >
