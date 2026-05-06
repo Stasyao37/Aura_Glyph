@@ -9,8 +9,8 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
   const { theme, setTheme } = useTheme()
 
   const themes: { id: Theme; name: string; icon: React.ReactNode }[] = [
-    { id: "light", name: "Light", icon: <Sun size={18} /> },
-    { id: "dark", name: "Dark", icon: <Moon size={18} /> },
+    { id: "light", name: "Светлая", icon: <Sun size={18} /> },
+    { id: "dark", name: "Тёмная", icon: <Moon size={18} /> },
     { id: "aura-glow", name: "Aura Glow", icon: <Sparkles size={18} /> },
   ]
 
@@ -23,12 +23,12 @@ export default function SettingsPanel({ onClose }: SettingsPanelProps) {
     >
       <div className="absolute top-20 right-4 w-64 rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 shadow-lg backdrop-blur-xl">
         <h2 className="mb-4 text-lg font-semibold text-[var(--color-text-primary)]">
-          Settings
+          Настройки
         </h2>
 
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-[var(--color-text-muted)]">
-            Theme
+            Тема
           </h3>
           <div className="flex items-center gap-2">
             {themes.map(({ id, name, icon }) => (
