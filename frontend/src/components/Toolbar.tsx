@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from "react"
+import { useModal } from "../hooks/useModal"
 import {
   Bold, Italic, Underline,
   AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -73,6 +74,7 @@ export default function Toolbar({
   onNew, onOpen, onSave, onSaveAs,
 }: ToolbarProps) {
   const ed = () => editorRef.current
+  const modal = useModal()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   function heading(level: string) {
@@ -80,10 +82,13 @@ export default function Toolbar({
     ed()?.insertAtLineStart("#".repeat(Number(level)) + " ")
   }
 
-  function insertLink() {
-    const url = prompt("URL ссылки:")
-    if (!url) return
-    ed()?.wrapSelection("[", `](${url})`)
+  async function insertLink() {
+    const result = await modal.prompt({
+      title: "Вставить ссылку",
+      fields: [{ id: "url", label: "URL", placeholder: "https://..." }],
+    })
+    if (!result?.url) return
+    ed()?.wrapSelection("[", `](${result.url})`)
   }
 
   function insertTOC() {
@@ -199,7 +204,10 @@ export default function Toolbar({
             <Settings size={14} />
           </Btn>
 
-          <Btn title="Экспорт PDF" onClick={() => alert("PDF export — скоро")}>
+          <Btn title="Экспорт PDF" onClick={() => void modal.info({
+            title: "PDF-экспорт",
+            message: "Функция в разработке — появится в следующем обновлении.",
+          })}>
             <FileDown size={14} />
           </Btn>
         </div>

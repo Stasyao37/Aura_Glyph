@@ -9,8 +9,13 @@ import {
   OpenFileWithDialog,
   SaveFile,
   SaveFileWithDialog,
+  SetDirty,
+  ForceQuit,
 } from "../wailsjs/go/main/App"
+import { EventsOn, EventsOff } from "../wailsjs/runtime/runtime"
 import { useTheme } from "./hooks/useTheme"
+import { useModal } from "./hooks/useModal"
+import { useDraftPersistence } from "./hooks/useDraftPersistence"
 
 const Editor = lazy(() => import("./components/Editor"))
 
@@ -35,12 +40,13 @@ const PLACEHOLDER = `# Привет, Aura Glyph
 `
 
 export default function App() {
-  useTheme() // Activate theme listener
+  useTheme()
+  const modal = useModal()
 
   const [content,    setContent]    = useState(PLACEHOLDER)
   const [isDirty,    setIsDirty]    = useState(false)
   const [filePath,   setFilePath]   = useState<string | null>(null)
-  const [splitPct,   setSplitPct] =  useState(50)
+  const [splitPct,   setSplitPct]   = useState(50)
   const [viewMode,   setViewMode]   = useState<ViewMode>("split")
   const [fontFamily,     setFontFamily]     = useState("Inter, system-ui, sans-serif")
   const [fontSize,       setFontSize]       = useState("14px")
@@ -51,8 +57,7 @@ export default function App() {
   const editorRef    = useRef<EditorHandle>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Рефы нужны чтобы хоткеи всегда видели актуальные значения
-  // (хендлеры создаются один раз — без рефов был бы stale closure)
+  // Refs so hotkey callbacks always see current values (avoids stale closure)
   const contentRef  = useRef(content)
   const filePathRef = useRef(filePath)
   const isDirtyRef  = useRef(isDirty)
@@ -60,49 +65,123 @@ export default function App() {
   useEffect(() => { filePathRef.current = filePath }, [filePath])
   useEffect(() => { isDirtyRef.current  = isDirty  }, [isDirty])
 
-  const filename = filePath ? filePath.split("/").pop()! : "untitled.md"
+  const filename = filePath
+    ? filePath.replace(/\\/g, "/").split("/").pop()!
+    : "untitled.md"
+
+  // Helper: mark document as dirty and sync to Go side
+  function markDirty() {
+    setIsDirty(true)
+    SetDirty(true).catch(() => {})
+  }
+
+  // Helper: mark document as clean and sync to Go side
+  function markClean() {
+    setIsDirty(false)
+    SetDirty(false).catch(() => {})
+  }
 
   function handleChange(val: string) {
     setContent(val)
-    setIsDirty(true)
+    if (!isDirtyRef.current) markDirty()
   }
 
-  const handleNew = useCallback(() => {
-    if (isDirtyRef.current && !confirm("Есть несохранённые изменения. Создать новый документ?")) return
+  const handleNew = useCallback(async () => {
+    if (isDirtyRef.current) {
+      const ok = await modal.confirm({
+        message: "Есть несохранённые изменения. Создать новый документ?",
+        confirmLabel: "Создать",
+      })
+      if (!ok) return
+    }
     setContent("")
     setFilePath(null)
-    setIsDirty(false)
-  }, [])
+    markClean()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modal])
 
   const handleOpen = useCallback(async () => {
+    if (isDirtyRef.current) {
+      const ok = await modal.confirm({
+        message: "Есть несохранённые изменения. Открыть другой файл?",
+        confirmLabel: "Открыть",
+      })
+      if (!ok) return
+    }
     const result = await OpenFileWithDialog()
     if (!result) return
     setContent(result.content)
     setFilePath(result.path || null)
-    setIsDirty(false)
-  }, [])
+    markClean()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modal])
 
   const handleSaveAs = useCallback(async () => {
     const newPath = await SaveFileWithDialog(contentRef.current, filePathRef.current ?? "")
     if (newPath) {
       setFilePath(newPath)
-      setIsDirty(false)
+      markClean()
+      clearDraftRef.current()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSave = useCallback(async () => {
     if (filePathRef.current) {
       await SaveFile(filePathRef.current, contentRef.current)
-      setIsDirty(false)
+      markClean()
+      clearDraftRef.current()
     } else {
-      // Ещё нет пути — показываем "Сохранить как"
       const newPath = await SaveFileWithDialog(contentRef.current, "")
       if (newPath) {
         setFilePath(newPath)
-        setIsDirty(false)
+        markClean()
+        clearDraftRef.current()
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Close button in TitleBar — shows modal when dirty, else quits directly
+  const handleCloseRequest = useCallback(async () => {
+    if (!isDirtyRef.current) { ForceQuit(); return }
+    const ok = await modal.confirm({
+      title: "Закрыть Aura Glyph",
+      message: "Есть несохранённые изменения. Выйти без сохранения?",
+      confirmLabel: "Закрыть",
+    })
+    if (ok) ForceQuit()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modal])
+
+  // Alt+F4 / taskbar close — Go emits "close-requested" when OnBeforeClose fires
+  useEffect(() => {
+    EventsOn("close-requested", () => {
+      modal
+        .confirm({
+          title: "Закрыть Aura Glyph",
+          message: "Есть несохранённые изменения. Выйти без сохранения?",
+          confirmLabel: "Закрыть",
+        })
+        .then(ok => { if (ok) ForceQuit() })
+    })
+    return () => EventsOff("close-requested")
+  }, [modal])
+
+  // Draft persistence — stable clearDraft exposed via ref for handleSave/handleSaveAs
+  const clearDraftRef = useRef(() => {})
+  const { clearDraft } = useDraftPersistence({
+    content,
+    filePath,
+    isDirty,
+    onRestore: useCallback((c, p) => {
+      setContent(c)
+      setFilePath(p)
+      markDirty()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []),
+  })
+  useEffect(() => { clearDraftRef.current = clearDraft }, [clearDraft])
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -157,13 +236,13 @@ export default function App() {
   return (
     <div className="relative h-screen bg-bg-deep overflow-hidden">
 
-      {/* ── Ambient background glows (subtle, not blurred) ── */}
+      {/* ── Ambient background glows ── */}
       <div
         className="pointer-events-none fixed inset-0"
         style={{ background: 'var(--bg-ambient)' }}
       />
 
-      {/* ── Fixed matte panel ── */}
+      {/* ── Fixed frosted header (TitleBar + Toolbar) ── */}
       <div
         className="fixed top-0 left-0 right-0 z-50 backdrop-blur-2xl"
         style={{
@@ -172,7 +251,7 @@ export default function App() {
           boxShadow: 'var(--shadow-header)',
         }}
       >
-        <TitleBar filename={filename} isDirty={isDirty} />
+        <TitleBar filename={filename} isDirty={isDirty} onCloseRequest={handleCloseRequest} />
         <Toolbar
           editorRef={editorRef}
           viewMode={viewMode}
@@ -193,7 +272,7 @@ export default function App() {
         />
       </div>
 
-      {/* ── Main — занимает весь экран, контент уходит под стеклянный хедер ── */}
+      {/* ── Main — content scrolls under the frosted header ── */}
       <main ref={containerRef} className="flex h-screen overflow-hidden select-none">
         {showEditor && (
           <div

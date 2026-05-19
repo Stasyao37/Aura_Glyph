@@ -17,3 +17,11 @@ export function SaveFile(arg1, arg2) {
 export function SaveFileWithDialog(arg1, arg2) {
   return window['go']['main']['App']['SaveFileWithDialog'](arg1, arg2);
 }
+
+export function SetDirty(arg1) {
+  return window['go']['main']['App']['SetDirty'](arg1);
+}
+
+export function ForceQuit() {
+  return window['go']['main']['App']['ForceQuit']();
+}

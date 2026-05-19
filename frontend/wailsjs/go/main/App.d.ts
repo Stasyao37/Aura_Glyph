@@ -9,3 +9,7 @@ export function RenderMarkdown(arg1:string):Promise<string>;
 export function SaveFile(arg1:string,arg2:string):Promise<void>;
 
 export function SaveFileWithDialog(arg1:string,arg2:string):Promise<string>;
+
+export function SetDirty(arg1:boolean):Promise<void>;
+
+export function ForceQuit():Promise<void>;
