@@ -20,7 +20,7 @@ A next-generation Markdown editor built for those who care about aesthetics as m
 
 Aura Glyph is the first tool in the **Aura Suite** ecosystem — a lightweight, cross-platform Markdown editor with a frosted glass interface and a focus on visual comfort. No bloat, no cloud, no distractions. Just you and your text.
 
-The interface draws from a **deep blue monochrome palette** accented by the Aura Glow gradient — a signature sweep from teal `#2DD4BF` to violet `#7C3AED`.
+The interface draws from a **deep blue monochrome palette** accented by the Aura Glow gradient — a signature sweep from blue `#3B82F6` to light teal `#5EEAD4`.
 
 ---
 
