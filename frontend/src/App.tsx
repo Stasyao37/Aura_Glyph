@@ -91,6 +91,7 @@ export default function App() {
       const ok = await modal.confirm({
         message: "Есть несохранённые изменения. Создать новый документ?",
         confirmLabel: "Создать",
+        destructive: true,
       })
       if (!ok) return
     }
@@ -105,6 +106,7 @@ export default function App() {
       const ok = await modal.confirm({
         message: "Есть несохранённые изменения. Открыть другой файл?",
         confirmLabel: "Открыть",
+        destructive: true,
       })
       if (!ok) return
     }
@@ -149,6 +151,7 @@ export default function App() {
       title: "Закрыть Aura Glyph",
       message: "Есть несохранённые изменения. Выйти без сохранения?",
       confirmLabel: "Закрыть",
+      destructive: true,
     })
     if (ok) ForceQuit()
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,6 +165,7 @@ export default function App() {
           title: "Закрыть Aura Glyph",
           message: "Есть несохранённые изменения. Выйти без сохранения?",
           confirmLabel: "Закрыть",
+          destructive: true,
         })
         .then(ok => { if (ok) ForceQuit() })
     })

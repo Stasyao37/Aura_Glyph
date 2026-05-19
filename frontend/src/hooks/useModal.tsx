@@ -16,6 +16,7 @@ export type ModalEntry =
       message: string
       confirmLabel?: string
       cancelLabel?: string
+      destructive?: boolean
       resolve: (v: boolean) => void
     }
   | {
@@ -39,6 +40,7 @@ type ModalAPI = {
     message: string
     confirmLabel?: string
     cancelLabel?: string
+    destructive?: boolean
   }): Promise<boolean>
   prompt(opts: {
     title?: string
@@ -55,7 +57,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const clear = () => setEntry(null)
 
   const confirm = useCallback(
-    (opts: { title?: string; message: string; confirmLabel?: string; cancelLabel?: string }) =>
+    (opts: { title?: string; message: string; confirmLabel?: string; cancelLabel?: string; destructive?: boolean }) =>
       new Promise<boolean>(resolve => setEntry({ kind: "confirm", ...opts, resolve })),
     []
   )

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import type { ModalEntry } from "../hooks/useModal"
 
 export default function Modal({
@@ -52,6 +52,22 @@ function ConfirmView({
   entry: Extract<ModalEntry, { kind: "confirm" }>
   onDismiss: () => void
 }) {
+  const rowRef = useRef<HTMLDivElement>(null)
+
+  // Arrow key navigation between Cancel and Confirm buttons
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return
+      e.preventDefault()
+      const btns = rowRef.current?.querySelectorAll<HTMLButtonElement>("button")
+      if (!btns || btns.length < 2) return
+      if (document.activeElement === btns[0]) btns[1].focus()
+      else btns[0].focus()
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [])
+
   return (
     <>
       {entry.title && (
@@ -62,11 +78,15 @@ function ConfirmView({
       <p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
         {entry.message}
       </p>
-      <div className="flex gap-2 mt-5 justify-end">
+      <div ref={rowRef} className="flex gap-2 mt-5 justify-end">
         <Btn variant="ghost" onClick={() => { entry.resolve(false); onDismiss() }}>
           {entry.cancelLabel ?? "Отмена"}
         </Btn>
-        <Btn variant="accent" onClick={() => { entry.resolve(true); onDismiss() }} autoFocus>
+        <Btn
+          variant={entry.destructive ? "destructive" : "accent"}
+          onClick={() => { entry.resolve(true); onDismiss() }}
+          autoFocus
+        >
           {entry.confirmLabel ?? "Да"}
         </Btn>
       </div>
@@ -174,31 +194,35 @@ function Btn({
 }: {
   children: React.ReactNode
   onClick?: () => void
-  variant: "ghost" | "accent"
+  variant: "ghost" | "accent" | "destructive"
   autoFocus?: boolean
   type?: "button" | "submit"
 }) {
+  const isGhost       = variant === "ghost"
+  const isDestructive = variant === "destructive"
+
   return (
     <button
       type={type}
       onClick={onClick}
       autoFocus={autoFocus}
-      className={`
-        px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
-        ${variant === "ghost"
-          ? "hover:bg-[var(--glass-border)]"
-          : "border hover:shadow-[0_0_14px_rgba(30,64,175,0.45)]"
-        }
-      `}
-      style={
-        variant === "ghost"
-          ? { color: "var(--color-text-muted)" }
-          : {
-              background: "rgba(30,64,175,0.2)",
-              borderColor: "rgba(30,64,175,0.35)",
-              color: "var(--color-accent-light)",
-            }
-      }
+      className="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+                 border focus:outline-none
+                 hover:bg-[rgba(30,64,175,0.15)] hover:shadow-[0_0_14px_rgba(30,64,175,0.45)]
+                 focus:bg-[rgba(30,64,175,0.15)] focus:shadow-[0_0_14px_rgba(30,64,175,0.45)]"
+      style={{
+        borderColor: isGhost
+          ? "transparent"
+          : isDestructive
+          ? "rgba(239,68,68,0.25)"
+          : "rgba(30,64,175,0.35)",
+        color: isGhost
+          ? "var(--color-text-subtle)"
+          : isDestructive
+          ? "rgb(248,113,113)"
+          : "var(--color-accent-light)",
+        background: isGhost || isDestructive ? "transparent" : "rgba(30,64,175,0.15)",
+      }}
     >
       {children}
     </button>
