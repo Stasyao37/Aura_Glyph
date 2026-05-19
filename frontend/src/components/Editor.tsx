@@ -75,7 +75,7 @@ const auraHighlight = HighlightStyle.define([
   { tag: tags.emphasis, color: "var(--color-text-muted)", fontStyle: "italic" },
   { tag: tags.link,     color: "var(--color-accent-light)" },
   { tag: tags.url,      color: "var(--color-aura-teal)" },
-  { tag: tags.monospace,      color: "var(--color-aura-purple)", fontFamily: "monospace" },
+  { tag: tags.monospace,      color: "var(--color-aura-teal-light)", fontFamily: "monospace" },
   { tag: tags.strikethrough,  color: "var(--color-text-subtle)", textDecoration: "line-through" },
   { tag: tags.meta,           color: "var(--color-text-subtle)" },
   { tag: tags.processingInstruction, color: "var(--color-text-subtle)" },

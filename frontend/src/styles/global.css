@@ -12,10 +12,11 @@
   --color-text-muted:   #90909A;
   --color-text-subtle:  #3A3A4A;
 
-  --color-accent:       #1E40AF;
-  --color-accent-light: #3B82F6;
-  --color-aura-teal:    #2DD4BF;
-  --color-aura-purple:  #7C3AED;
+  --color-accent:           #1E40AF;
+  --color-accent-light:     #3B82F6;
+  --color-aura-blue:        #3B82F6;
+  --color-aura-teal:        #2DD4BF;
+  --color-aura-teal-light:  #5EEAD4;
 
   --bg-ambient:    transparent;
   --shadow-header: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 0 rgba(0,0,0,0.4), 0 12px 24px -8px rgba(0,0,0,0.55);
@@ -26,6 +27,13 @@
   --glow-accent: 0 0 18px rgba(30, 64, 175, 0.45);
   --glow-aura:   transparent;
   --glow-close:  0 0 14px rgba(239, 68, 68, 0.5);
+
+  /* Тонкая акцентная линия под верхним краем titlebar.
+     В aura-glow заменяется на фирменный градиент. */
+  --titlebar-accent: linear-gradient(to right,
+    transparent 0%,
+    rgba(30, 64, 175, 0.6) 50%,
+    transparent 100%);
 }
 
 
@@ -35,10 +43,19 @@ html.dark {
 }
 
 
-/* ── Aura Glow — фирменная тема с teal → purple свечением ── */
+/* ── Aura Glow — фирменная тема: blue → light teal свечение ── */
 html.aura-glow {
-  --bg-ambient:  radial-gradient(ellipse 50% 30% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 100%);
-  --glow-aura:   0 0 24px rgba(124, 58, 237, 0.35);
+  --bg-ambient:
+    radial-gradient(ellipse 60% 22% at 50% 0%,   rgba( 59, 130, 246, 0.10) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 30% at 50% 100%, rgba( 94, 234, 212, 0.09) 0%, transparent 100%);
+  --glow-aura:   0 0 24px rgba(59, 130, 246, 0.35);
+  --titlebar-accent: linear-gradient(to right,
+    transparent 0%,
+    rgba(59, 130, 246, 0.0) 10%,
+    rgba(59, 130, 246, 0.85) 35%,
+    rgba(94, 234, 212, 0.85) 65%,
+    rgba(94, 234, 212, 0.0) 90%,
+    transparent 100%);
 }
 
 
@@ -54,6 +71,10 @@ html.light {
   --glass-border:       rgba(0, 0, 0, 0.1);
   --glow-accent:        0 0 16px rgba(30, 64, 175, 0.25);
   --glow-close:         0 0 14px rgba(239, 68, 68, 0.35);
+  --titlebar-accent: linear-gradient(to right,
+    transparent 0%,
+    rgba(30, 64, 175, 0.35) 50%,
+    transparent 100%);
 }
 
 
@@ -152,17 +173,17 @@ body {
 .prose code {
   font-family: "JetBrains Mono", "Fira Code", monospace;
   font-size: 0.875em;
-  color: var(--color-aura-purple);
-  background: rgba(124, 58, 237, 0.12);
+  color: var(--color-aura-teal);
+  background: rgba(45, 212, 191, 0.10);
   padding: 0.15em 0.4em;
   border-radius: 4px;
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  border: 1px solid rgba(45, 212, 191, 0.18);
 }
 
 html.light .prose code {
-  color: #6d28d9;
-  background: rgba(109,40,217,0.07);
-  border-color: rgba(109,40,217,0.15);
+  color: #0E7490;
+  background: rgba(14, 116, 144, 0.07);
+  border-color: rgba(14, 116, 144, 0.15);
 }
 
 .prose pre {
@@ -238,7 +259,7 @@ html.dark .prose tr:hover td { background: rgba(255,255,255,0.02); }
 .prose.prose-light strong         { color: #111; }
 .prose.prose-light em             { color: #333; }
 .prose.prose-light a              { color: #1e40af; }
-.prose.prose-light code           { color: #6d28d9; background: rgba(109,40,217,0.07); border-color: rgba(109,40,217,0.15); }
+.prose.prose-light code           { color: #0E7490; background: rgba(14,116,144,0.07); border-color: rgba(14,116,144,0.15); }
 .prose.prose-light pre            { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.08); }
 .prose.prose-light pre code       { color: #1a1a1a; background: none; border: none; }
 .prose.prose-light blockquote     { color: #555; background: rgba(30,64,175,0.04); border-left-color: #1e40af; }

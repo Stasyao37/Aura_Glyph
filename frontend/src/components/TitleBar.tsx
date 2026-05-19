@@ -15,8 +15,11 @@ const noDrag = { "--wails-draggable": "no-drag" } as React.CSSProperties
 export default function TitleBar({ filename, isDirty }: TitleBarProps) {
   return (
     <header className="relative flex items-center h-10 shrink-0">
-      {/* Subtle accent line at top */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1E40AF]/60 to-transparent" />
+      {/* Theme-aware accent line at top edge (см. --titlebar-accent в global.css) */}
+      <div
+        className="absolute inset-x-0 top-0 h-px pointer-events-none"
+        style={{ background: 'var(--titlebar-accent)' }}
+      />
 
       {/* Left — app name (not draggable so clicks register) */}
       <div className="flex items-center gap-2 px-4 w-44 shrink-0" style={noDrag}>
