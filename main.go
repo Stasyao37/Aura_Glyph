@@ -31,7 +31,8 @@ func main() {
 		Linux: &linux.Options{
 			WebviewGpuPolicy: linux.WebviewGpuPolicyAlways,
 		},
-		OnStartup: app.startup,
+		OnStartup:       app.startup,
+		OnBeforeClose:   app.OnBeforeClose,
 		Bind: []any{
 			app,
 			bridge,

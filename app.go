@@ -11,7 +11,8 @@ import (
 )
 
 type App struct {
-	ctx context.Context
+	ctx     context.Context
+	isDirty bool
 }
 
 func NewApp() *App {
@@ -76,4 +77,25 @@ func (a *App) SaveFileWithDialog(content string, currentPath string) (string, er
 
 func (a *App) RenderMarkdown(source string) (string, error) {
 	return parser.RenderMarkdown(source)
+}
+
+// SetDirty is called from the frontend to sync unsaved-changes state.
+func (a *App) SetDirty(dirty bool) {
+	a.isDirty = dirty
+}
+
+// ForceQuit bypasses the OnBeforeClose guard and quits immediately.
+func (a *App) ForceQuit() {
+	a.isDirty = false
+	runtime.Quit(a.ctx)
+}
+
+// OnBeforeClose blocks the window close when there are unsaved changes,
+// then signals the frontend to show a confirmation dialog.
+func (a *App) OnBeforeClose(ctx context.Context) bool {
+	if !a.isDirty {
+		return false // allow close
+	}
+	runtime.EventsEmit(ctx, "close-requested")
+	return true // block close; frontend will call ForceQuit if user confirms
 }
