@@ -200,17 +200,30 @@ function Btn({
 }) {
   const isGhost       = variant === "ghost"
   const isDestructive = variant === "destructive"
+  const baseBg        = isGhost || isDestructive ? "transparent" : "rgba(30,64,175,0.15)"
+
+  function activate(e: { currentTarget: HTMLButtonElement }) {
+    e.currentTarget.style.background = "rgba(30,64,175,0.15)"
+    e.currentTarget.style.boxShadow  = "0 0 14px rgba(30,64,175,0.45)"
+  }
+  function deactivate(e: { currentTarget: HTMLButtonElement }) {
+    e.currentTarget.style.background = baseBg
+    e.currentTarget.style.boxShadow  = ""
+  }
 
   return (
     <button
       type={type}
       onClick={onClick}
       autoFocus={autoFocus}
+      onMouseEnter={activate}
+      onMouseLeave={deactivate}
+      onFocus={activate}
+      onBlur={deactivate}
       className="px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
-                 border focus:outline-none
-                 hover:bg-[rgba(30,64,175,0.15)] hover:shadow-[0_0_14px_rgba(30,64,175,0.45)]
-                 focus:bg-[rgba(30,64,175,0.15)] focus:shadow-[0_0_14px_rgba(30,64,175,0.45)]"
+                 border focus:outline-none"
       style={{
+        background:  baseBg,
         borderColor: isGhost
           ? "transparent"
           : isDestructive
@@ -221,7 +234,6 @@ function Btn({
           : isDestructive
           ? "rgb(248,113,113)"
           : "var(--color-accent-light)",
-        background: isGhost || isDestructive ? "transparent" : "rgba(30,64,175,0.15)",
       }}
     >
       {children}
