@@ -1,3 +1,4 @@
+import { Minus, Maximize2, X } from "lucide-react"
 import {
   WindowMinimise,
   WindowToggleMaximise,
@@ -52,24 +53,22 @@ export default function TitleBar({ filename, isDirty, onCloseRequest }: TitleBar
 
       {/* Right — window controls */}
       <div className="flex items-center w-44 justify-end shrink-0" style={noDrag}>
-        <WinButton onClick={WindowMinimise}        label="−" />
-        <WinButton onClick={WindowToggleMaximise}  label="⬜" small />
-        <WinButton onClick={onCloseRequest ?? (() => {})} label="✕" isClose />
+        <WinButton onClick={WindowMinimise}><Minus size={13} /></WinButton>
+        <WinButton onClick={WindowToggleMaximise}><Maximize2 size={11} /></WinButton>
+        <WinButton onClick={onCloseRequest ?? (() => {})} isClose><X size={13} /></WinButton>
       </div>
     </header>
   )
 }
 
 function WinButton({
+  children,
   onClick,
-  label,
   isClose = false,
-  small = false,
 }: {
+  children: React.ReactNode
   onClick: () => void
-  label: string
   isClose?: boolean
-  small?: boolean
 }) {
   return (
     <button
@@ -77,15 +76,14 @@ function WinButton({
       className={`
         flex items-center justify-center w-11 h-10
         transition-all duration-150
-        ${small ? "text-[10px]" : "text-[13px]"}
         ${isClose
           ? "hover:bg-red-500/15 hover:text-red-400 hover:[box-shadow:var(--glow-close)]"
-          : "hover:bg-white/[0.06]"
+          : "hover:bg-white/[0.06] hover:text-[var(--color-text-primary)]"
         }
       `}
       style={{ color: "var(--color-text-subtle)" }}
     >
-      {label}
+      {children}
     </button>
   )
 }
